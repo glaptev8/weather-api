@@ -13,6 +13,7 @@ import org.weatherapi.exception.UnauthorizedException;
 import org.weatherapi.security.ApiKeyFilter;
 
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.jsonwebtoken.MalformedJwtException;
 import reactor.core.publisher.Mono;
 
 @RestControllerAdvice
@@ -48,5 +49,4 @@ public class ApiErrorHandler {
       HttpStatus.TOO_MANY_REQUESTS
     ));
   }
-
 }

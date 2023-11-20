@@ -3,13 +3,12 @@ package org.weatherapi.security;
 import java.util.Base64;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.weatherapi.dto.VerificationResult;
-import org.weatherapi.exception.AuthException;
 import org.weatherapi.exception.UnauthorizedException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import reactor.core.publisher.Mono;
 
 public class JwtHandler {
@@ -37,9 +36,13 @@ public class JwtHandler {
   }
 
   private Claims getClaimsFromToken(String token) {
-    return Jwts.parser()
-      .setSigningKey(Base64.getEncoder().encodeToString(secret.getBytes()))
-      .parseClaimsJws(token)
-      .getBody();
+    try {
+      return Jwts.parser()
+        .setSigningKey(Base64.getEncoder().encodeToString(secret.getBytes()))
+        .parseClaimsJws(token)
+        .getBody();
+    } catch (MalformedJwtException e) {
+      throw new UnauthorizedException("incorrect jwt token");
+    }
   }
 }

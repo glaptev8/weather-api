@@ -1,11 +1,9 @@
-package org.weatherapi.ratelimiter;
+package org.weatherapi.security;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -15,65 +13,33 @@ import org.weatherapi.service.StationServiceImpl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StationLimiterTest extends TestContainerConfig {
-
+public class ValidateJwtTokenTest extends TestContainerConfig {
   @Autowired
   private WebTestClient webTestClient;
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private RateLimiterRegistry rateLimiterRegistry;
-
   @MockBean
   private StationServiceImpl stationService;
 
-
   @Test
-  public void getStationsTest() throws JsonProcessingException {
-    int limitForPeriod = rateLimiterRegistry.rateLimiter("stations_limiter").getRateLimiterConfig().getLimitForPeriod();
-
-    when(stationService.getAllStation()).thenReturn(Flux.just());
+  public void validateJwtTokenValidTet() throws JsonProcessingException {
     generateApiKey("test", "test");
-    for (int i = 0; i < limitForPeriod; i++) {
-      webTestClient.get().uri("/api/stations")
-        .header("x-api-key", apiKey)
-        .exchange()
-        .expectStatus().isOk();
-    }
-
-    webTestClient.get().uri("/api/stations")
-      .header("x-api-key", apiKey)
+    webTestClient.post().uri("/api/get-api-key")
+      .header("Authorization", "Bearer " + jwtToken)
       .exchange()
-      .expectStatus().isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+      .expectStatus().isOk();
   }
 
   @Test
-  public void getStationTest() throws JsonProcessingException {
-    int limitForPeriod = rateLimiterRegistry.rateLimiter("station_limiter").getRateLimiterConfig().getLimitForPeriod();
-
-    when(stationService.getInfoByStation(any())).thenReturn(Mono.empty());
-
-    generateApiKey("test", "test");
-    for (int i = 0; i < limitForPeriod; i++) {
-      webTestClient.get().uri("/api/stations/testName")
-        .header("x-api-key", apiKey)
-        .exchange()
-        .expectStatus().isOk();
-    }
-
-    webTestClient.get().uri("/api/stations/testName")
-      .header("x-api-key", apiKey)
+  public void validateJwtTokenInValidTet() {
+    webTestClient.post().uri("/api/get-api-key")
+      .header("Authorization", "Bearer " + "invalidJwtToken")
       .exchange()
-      .expectStatus().isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+      .expectStatus().isUnauthorized();
   }
 
   private void generateApiKey(String userName, String password) throws JsonProcessingException {

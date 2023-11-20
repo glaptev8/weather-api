@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,13 +25,14 @@ import reactor.core.publisher.Mono;
 
 @Component
 @EnableScheduling
+@Profile("!test")
 @RequiredArgsConstructor
 public class WeatherGeneratorJob {
 
   private final StationService stationService;
   private final static Random random = new Random();
 
-  @Scheduled(fixedRate = 10000)
+  @Scheduled(fixedRate = 3 * 60 * 60 * 1000)
   public void generateStation() {
     stationService
       .addStation(generateRandomStation())

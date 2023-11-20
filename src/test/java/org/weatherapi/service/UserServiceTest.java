@@ -1,11 +1,7 @@
 package org.weatherapi.service;
 
-import java.util.Base64;
-import java.util.Objects;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.StringUtils;
@@ -19,8 +15,6 @@ import org.weatherapi.entity.User;
 import org.weatherapi.mapper.MapStructMapper;
 import org.weatherapi.repository.ApiKeyRepository;
 import org.weatherapi.repository.UserRepository;
-import org.weatherapi.service.UserServiceImpl;
-import org.weatherapi.service.api.UserService;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -54,6 +48,7 @@ public class UserServiceTest {
 
     when(passwordEncoder.encode(passwordForUser)).thenReturn(encodedPasswordForTestUser);
     when(userRepository.save(testUser)).thenReturn(Mono.just(savedUserDto));
+    when(userRepository.existsByName(testUser.getName())).thenReturn(Mono.just(false));
     when(mapper.userToDto(savedUserDto)).thenReturn(savedTestUserDto);
 
     var saveResult = userService.saveUser(testUser);

@@ -14,4 +14,6 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
 
   @Query("Update weather_user set api_key = :apiKey where id = :userId")
   Mono<Void> updateApiKey(String apiKey, Long userId);
+
+  Mono<Boolean> existsByName(String name);
 }

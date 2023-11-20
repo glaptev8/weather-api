@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.weatherapi.dto.UserDto;
 import org.weatherapi.entity.User;
+import org.weatherapi.exception.AuthException;
 import org.weatherapi.mapper.MapStructMapper;
 import org.weatherapi.repository.UserRepository;
 import org.weatherapi.repository.ApiKeyRepository;
@@ -32,8 +33,16 @@ public class UserServiceImpl implements UserService {
     logger.info("saving user: {}", user);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     return userRepository
-      .save(user)
-      .map(mapper::userToDto)
+      .existsByName(user.getName())
+      .flatMap(exist -> {
+        if (!exist) {
+          return userRepository
+            .save(user)
+            .map(mapper::userToDto);
+        }
+        logger.info("user already exists: {}", user);
+        return Mono.error(new AuthException("user already exists", "WEATHERAPI_USER_EXISTS"));
+      })
       .doOnSuccess(savedUser -> logger.info("user was saved: {}", savedUser));
   }
 
