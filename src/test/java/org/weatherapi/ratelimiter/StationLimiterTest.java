@@ -1,6 +1,7 @@
 package org.weatherapi.ratelimiter;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,13 +30,17 @@ public class StationLimiterTest extends TestContainerConfig {
   private WebTestClient webTestClient;
   @Autowired
   private ObjectMapper objectMapper;
-
   @Autowired
   private RateLimiterRegistry rateLimiterRegistry;
-
   @MockBean
   private StationServiceImpl stationService;
 
+  static {
+    System.setProperty("resilience4j.ratelimiter.instances.stations_limiter.limit-for-period", "3");
+    System.setProperty("resilience4j.ratelimiter.instances.stations_limiter.limit-refresh-period", "20s");
+    System.setProperty("resilience4j.ratelimiter.instances.station_limiter.limit-for-period", "3");
+    System.setProperty("resilience4j.ratelimiter.instances.station_limiter.limit-refresh-period", "20s");
+  }
 
   @Test
   public void getStationsTest() throws JsonProcessingException {
@@ -77,10 +82,10 @@ public class StationLimiterTest extends TestContainerConfig {
   }
 
   private void generateApiKey(String userName, String password) throws JsonProcessingException {
-    if (apiKey != null) {
+    if (TestContainerConfig.apiKey != null) {
       return;
     }
-    if (jwtToken != null) {
+    if (TestContainerConfig.jwtToken != null) {
       setApiKey();
       return;
     }
@@ -103,7 +108,7 @@ public class StationLimiterTest extends TestContainerConfig {
       .expectStatus().isOk();
   }
   private void setJwtToken(User user) {
-    jwtToken = webTestClient.post().uri("/api/login")
+    TestContainerConfig.jwtToken = webTestClient.post().uri("/api/login")
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(user)
       .exchange()
@@ -113,7 +118,7 @@ public class StationLimiterTest extends TestContainerConfig {
       .blockFirst();
   }
   private void setApiKey() {
-    apiKey = webTestClient.post().uri("/api/get-api-key")
+    TestContainerConfig.apiKey = webTestClient.post().uri("/api/get-api-key")
       .header("Authorization", "Bearer " + jwtToken)
       .exchange()
       .expectStatus().isOk()

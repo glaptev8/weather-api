@@ -1,18 +1,20 @@
 package org.weatherapi.config;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import com.redis.testcontainers.RedisContainer;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public abstract class TestContainerConfig {
   private static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest");
   private static RedisContainer redisContainer = new RedisContainer(DockerImageName.parse("redis:latest"));
 
-  protected static String apiKey;
-  protected static String jwtToken;
-  protected static String userName;
+  protected static String apiKey = null;
+  protected static String jwtToken = null;
+  protected static String userName = null;
 
   @BeforeAll
   static void setUp() {

@@ -49,7 +49,7 @@ public class ApiKeyFilter implements WebFilter {
   }
 
   private Mono<Boolean> isValidApiKey(String apiKey) {
-    logger.info("validation api key");
+    logger.info("validation api key: {}", apiKey);
     return redisService.apiKeyExist(apiKey);
   }
 }

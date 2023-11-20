@@ -22,20 +22,20 @@ public class ValidateJwtTokenTest extends TestContainerConfig {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @MockBean
-  private StationServiceImpl stationService;
-
   @Test
   public void validateJwtTokenValidTet() throws JsonProcessingException {
     generateApiKey("test", "test");
-    webTestClient.post().uri("/api/get-api-key")
+    TestContainerConfig.apiKey = webTestClient.post().uri("/api/get-api-key")
       .header("Authorization", "Bearer " + jwtToken)
       .exchange()
-      .expectStatus().isOk();
+      .expectStatus().isOk()
+      .returnResult(String.class)
+      .getResponseBody()
+      .blockFirst();
   }
 
   @Test
-  public void validateJwtTokenInValidTet() {
+  public void validateJwtTokenInValidTest() {
     webTestClient.post().uri("/api/get-api-key")
       .header("Authorization", "Bearer " + "invalidJwtToken")
       .exchange()
@@ -43,10 +43,10 @@ public class ValidateJwtTokenTest extends TestContainerConfig {
   }
 
   private void generateApiKey(String userName, String password) throws JsonProcessingException {
-    if (apiKey != null) {
+    if (TestContainerConfig.apiKey != null) {
       return;
     }
-    if (jwtToken != null) {
+    if (TestContainerConfig.jwtToken != null) {
       setApiKey();
       return;
     }
@@ -69,7 +69,7 @@ public class ValidateJwtTokenTest extends TestContainerConfig {
       .expectStatus().isOk();
   }
   private void setJwtToken(User user) {
-    jwtToken = webTestClient.post().uri("/api/login")
+    TestContainerConfig.jwtToken = webTestClient.post().uri("/api/login")
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(user)
       .exchange()
@@ -79,7 +79,7 @@ public class ValidateJwtTokenTest extends TestContainerConfig {
       .blockFirst();
   }
   private void setApiKey() {
-    apiKey = webTestClient.post().uri("/api/get-api-key")
+    TestContainerConfig.apiKey = webTestClient.post().uri("/api/get-api-key")
       .header("Authorization", "Bearer " + jwtToken)
       .exchange()
       .expectStatus().isOk()

@@ -32,9 +32,6 @@ public class ApiKeyRepositoryImpl implements ApiKeyRepository {
   public Mono<Boolean> apiKeyExist(String apiKey) {
     return reactiveRedisTemplate.opsForList()
       .range(API_KEY_REDIS_KEY, 0, -1)
-      .collectList()
-      .map(list -> list != null && list.contains(apiKey))
-      .log()
-      .defaultIfEmpty(false);
+      .any(list -> list != null && list.contains(apiKey));
   }
 }
