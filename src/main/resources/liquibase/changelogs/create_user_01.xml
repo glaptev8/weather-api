@@ -1,0 +1,27 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+
+  <changeSet id="2023-11-15_1" author="Laptev Gleb">
+    <sql>
+        create table if not exists weather_user (
+          id       bigserial
+          constraint weather_user_id_pk
+          primary key,
+          name     varchar(128)  not null
+          constraint weather_user_name_pk
+          unique,
+          password varchar(2048) not null,
+          api_key  varchar(2048) not null
+          );
+        create unique index weather_user_name_uindex
+          on weather_user(name);
+    </sql>
+    <rollback>
+            drop table weather_user;
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>

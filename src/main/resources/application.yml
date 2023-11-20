@@ -1,0 +1,34 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+  r2dbc:
+    url: r2dbc:pool:postgres://localhost:5432/postgres
+    username: postgres
+    password: postgres
+#  liquibase:
+#    change-log: liquibase/changelog.xml
+#    driver-class-name: "org.postgresql.Driver"
+#    password: postgres
+#    user: postgres
+#    url: r2dbc:pool:postgres://localhost:5432/postgres
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+server:
+  port: 8082
+
+resilience4j:
+  ratelimiter:
+    instances:
+      station_limiter:
+        limit-for-period: 3
+        limit-refresh-period: 20s
+
+jwt:
+  secret: 426b1066314ea793aa5d0907d7323310eef672ab280958f1f667be70c61c9abf
+  expiration: 3600
+  issuer: weatherApi
