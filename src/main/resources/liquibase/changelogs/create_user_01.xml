@@ -16,7 +16,7 @@
           password varchar(2048) not null,
           api_key  varchar(2048) unique
           );
-        create unique index weather_user_name_uindex
+        create unique index if not exists weather_user_name_uindex
           on weather_user(name);
     </sql>
     <rollback>
