@@ -1,5 +1,6 @@
 package org.weatherapi.config;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -30,4 +31,10 @@ public abstract class TestContainerConfig {
     System.setProperty("spring.data.redis.host", redisContainer.getHost());
     System.setProperty("spring.data.redis.port", String.valueOf(redisContainer.getFirstMappedPort()));
   }
+
+//  @AfterAll
+//  static void close(){
+//    redisContainer.stop();
+//    postgresContainer.stop();
+//  }
 }

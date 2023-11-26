@@ -4,19 +4,19 @@ spring:
     hibernate:
       ddl-auto: create
   r2dbc:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: r2dbc:pool:postgres://localhost:5432/postgres
+    username: postgres
+    password: postgres
   liquibase:
     change-log: liquibase/changelog.xml
     driver-class-name: "org.postgresql.Driver"
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    user: ${SPRING_DATASOURCE_USERNAME}
-    url: ${LIQUIBASE_DATASOURCE_URL}
+    password: postgres
+    user: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
   data:
     redis:
-      host: ${SPRING_REDIS_HOST}
-      port: ${SPRING_REDIS_PORT}
+      host: localhost
+      port: 6379
 
 server:
   port: 8082
