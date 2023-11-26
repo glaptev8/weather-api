@@ -1,0 +1,33 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+
+  <changeSet id="2023-11-24_2" author="Laptev Gleb">
+    <sql>
+        create table if not exists weather (
+          id            bigserial
+            constraint weather_id_pk
+              primary key,
+          temperature   integer                 not null,
+          wind_duration varchar(32)             not null,
+          wind_speed    integer                 not null,
+          precipitation varchar(32)             not null,
+          cloud_type    varchar(64)             not null,
+          cloud_mark    integer                 not null,
+          station_id    bigint                  not null
+            constraint weather_station_id_fk
+              references station,
+          weather_date  timestamp               not null,
+          created_at    timestamp default now() not null
+        );
+        create index if not exists weather_station_id_index
+          on weather(station_id);
+    </sql>
+    <rollback>
+            drop table station;
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>

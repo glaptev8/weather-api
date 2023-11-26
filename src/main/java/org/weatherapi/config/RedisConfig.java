@@ -10,6 +10,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.weatherapi.entity.Station;
+import org.weatherapi.entity.Weather;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -46,7 +47,18 @@ public class RedisConfig {
   }
 
   @Bean
-  public ReactiveHashOperations<String, String, Station> reactiveHashOperations(@Qualifier("stationTemplate") ReactiveRedisTemplate<String, Station> reactiveRedisTemplate) {
-    return reactiveRedisTemplate.opsForHash();
+  @Qualifier("weatherTemplate")
+  public ReactiveRedisTemplate<String, Weather> weatherReactiveRedisTemplate(
+    ReactiveRedisConnectionFactory factory, ObjectMapper objectMapper) {
+
+    RedisSerializationContext<String, Weather> serializationContext = RedisSerializationContext
+      .<String, Weather>newSerializationContext()
+      .key(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.string()))
+      .value(RedisSerializationContext.SerializationPair.fromSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, Weather.class)))
+      .hashKey(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.string()))
+      .hashValue(RedisSerializationContext.SerializationPair.fromSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, Weather.class)))
+      .build();
+
+    return new ReactiveRedisTemplate<>(factory, serializationContext);
   }
 }

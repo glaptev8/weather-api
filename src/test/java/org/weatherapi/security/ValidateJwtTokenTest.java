@@ -3,13 +3,13 @@ package org.weatherapi.security;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.weatherapi.config.TestContainerConfig;
+import org.weatherapi.dto.ApiKeyResponseDto;
+import org.weatherapi.dto.LoginResponseDto;
 import org.weatherapi.entity.User;
-import org.weatherapi.service.StationServiceImpl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,15 +23,16 @@ public class ValidateJwtTokenTest extends TestContainerConfig {
   private ObjectMapper objectMapper;
 
   @Test
-  public void validateJwtTokenValidTet() throws JsonProcessingException {
+  public void validateJwtTokenValidTest() throws JsonProcessingException {
     generateApiKey("test", "test");
     TestContainerConfig.apiKey = webTestClient.post().uri("/api/get-api-key")
       .header("Authorization", "Bearer " + jwtToken)
       .exchange()
       .expectStatus().isOk()
-      .returnResult(String.class)
+      .returnResult(ApiKeyResponseDto.class)
       .getResponseBody()
-      .blockFirst();
+      .blockFirst()
+      .apiKey();
   }
 
   @Test
@@ -74,17 +75,19 @@ public class ValidateJwtTokenTest extends TestContainerConfig {
       .bodyValue(user)
       .exchange()
       .expectStatus().isOk()
-      .returnResult(String.class)
+      .returnResult(LoginResponseDto.class)
       .getResponseBody()
-      .blockFirst();
+      .blockFirst()
+      .jwtToken();
   }
   private void setApiKey() {
     TestContainerConfig.apiKey = webTestClient.post().uri("/api/get-api-key")
       .header("Authorization", "Bearer " + jwtToken)
       .exchange()
       .expectStatus().isOk()
-      .returnResult(String.class)
+      .returnResult(ApiKeyResponseDto.class)
       .getResponseBody()
-      .blockFirst();
+      .blockFirst()
+      .apiKey();
   }
 }

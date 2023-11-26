@@ -1,0 +1,25 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+
+  <changeSet id="2023-11-24_1" author="Laptev Gleb">
+    <sql>
+        create table if not exists station (
+          id           bigserial
+            constraint station_id_pk
+              primary key,
+          station_name varchar(256)            not null
+            constraint station_station_name_pk
+              unique,
+          active       boolean                 not null,
+          created_at   timestamp default now() not null
+        );
+    </sql>
+    <rollback>
+            drop table station;
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>

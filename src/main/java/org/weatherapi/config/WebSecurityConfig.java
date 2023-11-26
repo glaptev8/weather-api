@@ -10,8 +10,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.weatherapi.security.ApiKeyFilter;
 import org.weatherapi.security.AuthenticationManager;
 import org.weatherapi.security.BearerTokenServerAuthenticationConverter;
 import org.weatherapi.security.JwtHandler;
@@ -25,7 +23,6 @@ import reactor.core.publisher.Mono;
 public class WebSecurityConfig {
   @Value("${jwt.secret}")
   private String secret;
-  private final ApiKeyFilter apiKeyFilter;
 
   @Bean
   public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) {
@@ -42,7 +39,6 @@ public class WebSecurityConfig {
       .accessDeniedHandler((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
       .and()
       .addFilterAt(bearerAuthenticationFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION)
-      .addFilterAt(apiKeyFilter, SecurityWebFiltersOrder.AUTHENTICATION)
       .build();
   }
 

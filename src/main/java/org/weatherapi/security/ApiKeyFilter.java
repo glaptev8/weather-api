@@ -8,7 +8,10 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import org.weatherapi.exception.UnauthorizedException;
 import org.weatherapi.repository.ApiKeyRepository;
+import org.weatherapi.util.ApiKeyRateLimiterUtil;
 
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -19,23 +22,24 @@ public class ApiKeyFilter implements WebFilter {
   private static final Logger logger = LoggerFactory.getLogger(ApiKeyFilter.class);
 
   private final ApiKeyRepository redisService;
+  private final ApiKeyRateLimiterUtil apiKeyRateLimiterUtil;
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
     var path = exchange.getRequest().getPath().value();
-
     return isExcludedEndpoint(path)
       .flatMap(isExcludedPath -> {
         if (!isExcludedPath) {
           String apiKey = exchange.getRequest().getHeaders().getFirst("X-API-KEY");
           return isValidApiKey(apiKey)
             .flatMap(isValidApiKey -> {
-              logger.info("api key is: {}", isValidApiKey);
-              if (!isValidApiKey) {
-                // Вопрос??
-                return Mono.error(new UnauthorizedException("not valid apiKey"));
-              }
-              return chain.filter(exchange);
+                logger.info("api key is: {}", apiKey);
+                if (!isValidApiKey) {
+                  return Mono.error(new UnauthorizedException("not valid apiKey"));
+                }
+                RateLimiter rateLimiter = apiKeyRateLimiterUtil.getRateLimiter(apiKey);
+                return chain.filter(exchange)
+                  .transformDeferred(RateLimiterOperator.of(rateLimiter));
             });
         }
         else {

@@ -15,6 +15,7 @@ import org.weatherapi.entity.User;
 import org.weatherapi.mapper.MapStructMapper;
 import org.weatherapi.repository.ApiKeyRepository;
 import org.weatherapi.repository.UserRepository;
+import org.weatherapi.util.ApiKeyRateLimiterUtil;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -34,6 +35,8 @@ public class UserServiceTest {
   private PasswordEncoder passwordEncoder;
   @InjectMocks
   private BCryptPasswordEncoder bCryptPasswordEncoder;
+  @Mock
+  private ApiKeyRateLimiterUtil apiKeyRateLimiterUtil;
   @InjectMocks
   private UserServiceImpl userService;
 
@@ -71,7 +74,7 @@ public class UserServiceTest {
     when(apiKeyRepository.removeApiKey(oldApiKey)).thenReturn(Mono.just(true));
     when(apiKeyRepository.addApiKey(any())).thenReturn(Mono.empty());
     when(userRepository.updateApiKey(any(), eq(userId))).thenReturn(Mono.empty());
-
+    doNothing().when(apiKeyRateLimiterUtil).deleteRateLimiterForOldKey(any());
     var saveResult = userService.generateNewApiKey(userId);
 
     StepVerifier.create(saveResult)

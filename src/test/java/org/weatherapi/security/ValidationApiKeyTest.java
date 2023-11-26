@@ -7,6 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.weatherapi.config.TestContainerConfig;
+import org.weatherapi.dto.ApiKeyResponseDto;
+import org.weatherapi.dto.LoginResponseDto;
 import org.weatherapi.entity.User;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -72,17 +74,19 @@ public class ValidationApiKeyTest extends TestContainerConfig {
       .bodyValue(user)
       .exchange()
       .expectStatus().isOk()
-      .returnResult(String.class)
+      .returnResult(LoginResponseDto.class)
       .getResponseBody()
-      .blockFirst();
+      .blockFirst()
+      .jwtToken();
   }
   private void setApiKey() {
     TestContainerConfig.apiKey = webTestClient.post().uri("/api/get-api-key")
       .header("Authorization", "Bearer " + jwtToken)
       .exchange()
       .expectStatus().isOk()
-      .returnResult(String.class)
+      .returnResult(ApiKeyResponseDto.class)
       .getResponseBody()
-      .blockFirst();
+      .blockFirst()
+      .apiKey();
   }
 }

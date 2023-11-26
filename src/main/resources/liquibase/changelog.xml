@@ -4,5 +4,7 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
   <include file="liquibase/changelogs/create_user_01.xml"/>
+  <include file="liquibase/changelogs/create_station_02.xml"/>
+  <include file="liquibase/changelogs/create_weather_03.xml"/>
 
 </databaseChangeLog>

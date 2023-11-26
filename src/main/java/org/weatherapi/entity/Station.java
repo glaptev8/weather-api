@@ -1,28 +1,26 @@
 package org.weatherapi.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import org.springframework.data.redis.core.RedisHash;
-import org.weatherapi.dto.WeatherDto;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Table
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RedisHash("Station")
 public class Station {
+  @Id
+  private Long id;
   private String stationName;
   private Boolean active;
-  private List<Weather> weather;
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH")
   private LocalDateTime createdAt;
-
-  public Station(String stationName, Boolean active, List<Weather> weather) {
-    this.stationName = stationName;
-    this.active = active;
-    this.weather = weather;
-  }
 }
