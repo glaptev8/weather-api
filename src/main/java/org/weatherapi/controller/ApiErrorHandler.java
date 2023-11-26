@@ -11,6 +11,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.weatherapi.dto.ErrorResponse;
 import org.weatherapi.exception.AuthException;
 import org.weatherapi.exception.UnauthorizedException;
+import io.jsonwebtoken.ExpiredJwtException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +35,10 @@ public class ApiErrorHandler implements ErrorWebExceptionHandler {
     if (ex instanceof UnauthorizedException e) {
       response.setStatusCode(HttpStatus.UNAUTHORIZED);
       return wrapResponse(response, e.getErrorCode(), e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+    if (ex instanceof ExpiredJwtException e) {
+      response.setStatusCode(HttpStatus.UNAUTHORIZED);
+      return wrapResponse(response, "WEATHERAPI_UNAUTHORIZED", e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
     if (ex instanceof RequestNotPermitted e) {
       response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
