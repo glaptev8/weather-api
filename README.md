@@ -29,5 +29,3 @@ The application is built using the following technologies:
 Feel free to explore and experiment with the various endpoints provided by the API.
 
 ---
-
-Feel free to adjust it further to better suit your preferences!
