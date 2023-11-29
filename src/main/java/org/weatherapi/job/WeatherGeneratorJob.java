@@ -16,7 +16,7 @@ public class WeatherGeneratorJob {
 
   private final WeatherGeneratorService weatherGeneratorService;
 
-  @Scheduled(fixedRate = 3 * 60 * 60 * 1000)
+  @Scheduled(fixedRate = 1000)
   public void generateStation() {
     weatherGeneratorService.generateStationAndWeather()
       .subscribe();
